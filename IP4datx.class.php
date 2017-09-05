@@ -3,8 +3,8 @@
 /*
     全球 IPv4 地址归属地数据库(IPIP.NET 版)
     高春辉(pAUL gAO) <gaochunhui@gmail.com>
-    Build 20141117 版权所有 IPIP.NET
-    (C) 2006 - 2014 保留所有权利
+    Build 20170905 版权所有 IPIP.NET
+    (C) 2006 - 2017 保留所有权利
     请注意及时更新 IP 数据库版本
     数据问题请加 QQ 群: 346280296
     Code for PHP 5.3+ only
@@ -17,8 +17,6 @@ class IP
     private static $fp     = NULL;
     private static $offset = NULL;
     private static $index  = NULL;
-
-    private static $cached = array();
 
     public static function find($ip)
     {
@@ -33,11 +31,6 @@ class IP
         if ($ipdot[0] < 0 || $ipdot[0] > 255 || count($ipdot) !== 4)
         {
             return 'N/A';
-        }
-
-        if (isset(self::$cached[$nip]) === TRUE)
-        {
-            return self::$cached[$nip];
         }
 
         if (self::$fp === NULL)
@@ -70,9 +63,7 @@ class IP
 
         fseek(self::$fp, self::$offset['len'] + $index_offset['len'] - 262144);
 
-        self::$cached[$nip] = explode("\t", fread(self::$fp, $index_length['len']));
-
-        return self::$cached[$nip];
+        return explode("\t", fread(self::$fp, $index_length['len']));
     }
 
     private static function init()
@@ -102,6 +93,8 @@ class IP
         if (self::$fp !== NULL)
         {
             fclose(self::$fp);
+
+            self::$fp = NULL;
         }
     }
 }
